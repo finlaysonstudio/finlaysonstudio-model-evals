@@ -1,0 +1,8 @@
+.aider*
+.DS_Store
+.env
+.jaypie
+/context/out
+cdk.out
+dist
+node_modules
