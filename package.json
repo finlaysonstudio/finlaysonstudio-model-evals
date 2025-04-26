@@ -7,7 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "build": "npm run build --workspaces",
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -25,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals/issues"
   },
-  "homepage": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals#readme"
+  "homepage": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals#readme",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
 }
