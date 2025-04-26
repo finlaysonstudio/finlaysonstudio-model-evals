@@ -1,0 +1,29 @@
+{
+  "name": "finlaysonstudio-model-evals",
+  "version": "1.0.0",
+  "description": "A monorepo for evaluating LLM randomness and distributional behavior.",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "vitest run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finlaysonstudio/finlaysonstudio-model-evals.git"
+  },
+  "keywords": [
+    "llm",
+    "evaluation",
+    "ai",
+    "randomness"
+  ],
+  "author": "Finlayson Studio",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals/issues"
+  },
+  "homepage": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals#readme"
+}
