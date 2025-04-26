@@ -9,6 +9,8 @@
   "scripts": {
     "test": "vitest run",
     "build": "npm run build --workspaces",
+    "dev": "vite",
+    "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
@@ -29,6 +31,7 @@
   },
   "homepage": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals#readme",
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.3"
   }
 }

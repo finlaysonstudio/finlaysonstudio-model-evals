@@ -3,8 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "index.js",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
   }
 }
