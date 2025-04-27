@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Create MongoDB connection configuration with tests
 - Create packages/models directory structure
 - Initialize eval-models package
 - Define Mongoose schemas for data persistence with validation tests
@@ -107,6 +106,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Create MongoDB connection configuration with tests
 
 ### Verified
 - Initialize root monorepo with package.json and npm workspace configuration
