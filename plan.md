@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Define Mongoose schemas for data persistence with validation tests
 - Implement model API interfaces using Vercel AI SDK with mocked API tests
 - Create packages/random-word directory structure
 - Initialize eval-random-words package
@@ -106,6 +105,7 @@ This package will handle model interfaces and data persistence.
 ### Dequeued
 
 ### Verified
+- Define Mongoose schemas for data persistence with validation tests
 - Initialize root monorepo with package.json and npm workspace configuration
 - Set up TypeScript configuration for the project
 - Configure Vite for build process

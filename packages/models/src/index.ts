@@ -3,3 +3,6 @@ export * from './config/database';
 
 // Export model client
 export * from './models/client';
+
+// Export schemas
+export * from './models/schemas';
