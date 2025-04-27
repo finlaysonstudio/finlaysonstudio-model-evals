@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Add Vitest for testing framework
 - Install Vercel AI SDK and its dependencies (zod)
 - Create MongoDB connection configuration with tests
 - Create packages/models directory structure
@@ -109,6 +108,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Add Vitest for testing framework
 
 
 ### Verified

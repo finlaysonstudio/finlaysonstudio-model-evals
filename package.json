@@ -31,7 +31,9 @@
   },
   "homepage": "https://github.com/finlaysonstudio/finlaysonstudio-model-evals#readme",
   "devDependencies": {
+    "@types/node": "^22.15.2",
     "typescript": "^5.8.3",
-    "vite": "^6.3.3"
+    "vite": "^6.3.3",
+    "vitest": "^3.1.2"
   }
 }
