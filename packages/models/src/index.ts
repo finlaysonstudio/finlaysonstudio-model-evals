@@ -1,5 +1,9 @@
-import { OpenAI, Anthropic, VertexAI } from 'ai';
+import { generateObject } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
 
 // Model interfaces
 export interface ModelClient {
@@ -25,69 +29,62 @@ export interface ModelConfig {
 export function createModelClient(config: ModelConfig): ModelClient {
   switch (config.provider) {
     case 'openai': {
-      const openai = new OpenAI({
-        apiKey: config.apiKey,
+      // Create a custom OpenAI provider with the API key
+      const customOpenAI = createOpenAI({
+        apiKey: config.apiKey
       });
       
       return {
         generateResponse: async (prompt: string) => {
-          const response = await openai.completions.create({
-            model: config.model || 'gpt-3.5-turbo-instruct',
+          const response = await generateObject({
+            model: customOpenAI(config.model || 'gpt-4o'),
             prompt,
-            max_tokens: 100,
-          });
-          return response.choices[0]?.text || '';
-        },
-        generateObject: async <T extends z.ZodType>(schema: T, prompt: string) => {
-          const result = await openai.completions.create({
-            model: config.model || 'gpt-3.5-turbo-instruct',
-            prompt,
-            max_tokens: 500,
-            response_format: { type: 'json_object' }
+            schema: z.object({ response: z.string() }),
+            mode: 'json'
           });
           
-          const text = result.choices[0]?.text || '{}';
-          try {
-            const jsonData = JSON.parse(text);
-            return schema.parse(jsonData);
-          } catch (e) {
-            throw new Error(`Failed to parse response as JSON or validate against schema: ${e}`);
-          }
+          return response.object.response;
+        },
+        generateObject: async <T extends z.ZodType>(schema: T, prompt: string) => {
+          const result = await generateObject({
+            model: customOpenAI(config.model || 'gpt-4o', {
+              structuredOutputs: true
+            }),
+            prompt,
+            schema
+          });
+          
+          return result.object;
         }
       };
     }
     
     case 'anthropic': {
-      const anthropic = new Anthropic({
-        apiKey: config.apiKey,
+      // Create a custom Anthropic provider with the API key
+      const customAnthropic = createAnthropic({
+        apiKey: config.apiKey
       });
       
       return {
         generateResponse: async (prompt: string) => {
-          const response = await anthropic.messages.create({
-            model: config.model || 'claude-3-haiku-20240307',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 100,
-          });
-          return response.content[0]?.text || '';
-        },
-        generateObject: async <T extends z.ZodType>(schema: T, prompt: string) => {
-          const result = await anthropic.messages.create({
-            model: config.model || 'claude-3-haiku-20240307',
-            messages: [{ 
-              role: 'user', 
-              content: `${prompt}\n\nRespond with valid JSON that matches this schema: ${JSON.stringify(schema.shape)}` 
-            }],
-            max_tokens: 500,
+          const response = await generateObject({
+            model: customAnthropic(config.model || 'claude-3-sonnet-20240229'),
+            prompt,
+            schema: z.object({ response: z.string() }),
+            mode: 'json'
           });
           
-          const text = result.content[0]?.text || '{}';
-          try {
-            const jsonData = JSON.parse(text);
-            return schema.parse(jsonData);
-          } catch (e) {
-            throw new Error(`Failed to parse response as JSON or validate against schema: ${e}`);
-          }
+          return response.object.response;
+        },
+        generateObject: async <T extends z.ZodType>(schema: T, prompt: string) => {
+          const result = await generateObject({
+            model: customAnthropic(config.model || 'claude-3-sonnet-20240229'),
+            prompt,
+            schema,
+            mode: 'json'
+          });
+          
+          return result.object;
         }
       };
     }

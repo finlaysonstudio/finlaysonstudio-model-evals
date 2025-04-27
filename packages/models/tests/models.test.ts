@@ -5,21 +5,23 @@ import { z } from 'zod';
 // Mock the AI SDK
 vi.mock('ai', () => {
   return {
-    OpenAI: vi.fn().mockImplementation(() => ({
-      completions: {
-        create: vi.fn().mockResolvedValue({
-          choices: [{ text: '{"result": "test response"}' }]
-        })
-      }
-    })),
-    Anthropic: vi.fn().mockImplementation(() => ({
-      messages: {
-        create: vi.fn().mockResolvedValue({
-          content: [{ text: '{"result": "test response"}' }]
-        })
-      }
-    })),
-    VertexAI: vi.fn()
+    generateObject: vi.fn().mockResolvedValue({
+      object: { result: 'test response', response: 'test response' }
+    })
+  };
+});
+
+vi.mock('@ai-sdk/openai', () => {
+  return {
+    openai: vi.fn().mockReturnValue('mocked-openai-model'),
+    createOpenAI: vi.fn().mockReturnValue(vi.fn().mockReturnValue('mocked-openai-model'))
+  };
+});
+
+vi.mock('@ai-sdk/anthropic', () => {
+  return {
+    anthropic: vi.fn().mockReturnValue('mocked-anthropic-model'),
+    createAnthropic: vi.fn().mockReturnValue(vi.fn().mockReturnValue('mocked-anthropic-model'))
   };
 });
 
@@ -69,6 +71,9 @@ describe('createModelClient', () => {
     });
     
     const response = await client.generateObject(schema, 'Test prompt');
-    expect(response).toEqual({ result: 'test response' });
+    expect(response).toEqual({ 
+      result: 'test response',
+      response: 'test response'
+    });
   });
 });
