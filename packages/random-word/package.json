@@ -16,5 +16,10 @@
     "randomness"
   ],
   "author": "Finlayson Studio",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ai": "^4.3.10",
+    "zod": "^3.24.3",
+    "@finlaysonstudio/eval-models": "^1.0.0"
+  }
 }

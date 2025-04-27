@@ -1,17 +1,74 @@
-import { describe, it, expect } from 'vitest';
-import { createModelClient } from '../src/index';
+import { describe, it, expect, vi } from 'vitest';
+import { createModelClient, ModelConfig } from '../src/index';
+import { z } from 'zod';
+
+// Mock the AI SDK
+vi.mock('ai', () => {
+  return {
+    OpenAI: vi.fn().mockImplementation(() => ({
+      completions: {
+        create: vi.fn().mockResolvedValue({
+          choices: [{ text: '{"result": "test response"}' }]
+        })
+      }
+    })),
+    Anthropic: vi.fn().mockImplementation(() => ({
+      messages: {
+        create: vi.fn().mockResolvedValue({
+          content: [{ text: '{"result": "test response"}' }]
+        })
+      }
+    })),
+    VertexAI: vi.fn()
+  };
+});
 
 describe('createModelClient', () => {
-  it('should return a ModelClient instance', async () => {
-    const client = await createModelClient('test-provider');
+  it('should create an OpenAI client', () => {
+    const config: ModelConfig = {
+      provider: 'openai',
+      apiKey: 'test-key'
+    };
+    
+    const client = createModelClient(config);
     expect(client).toBeDefined();
     expect(client).toHaveProperty('generateResponse');
+    expect(client).toHaveProperty('generateObject');
   });
 
-  it('should generate a response containing the prompt', async () => {
-    const client = await createModelClient('test-provider');
-    const prompt = 'Test prompt';
-    const response = await client.generateResponse(prompt);
-    expect(response).toContain(prompt);
+  it('should create an Anthropic client', () => {
+    const config: ModelConfig = {
+      provider: 'anthropic',
+      apiKey: 'test-key'
+    };
+    
+    const client = createModelClient(config);
+    expect(client).toBeDefined();
+    expect(client).toHaveProperty('generateResponse');
+    expect(client).toHaveProperty('generateObject');
+  });
+
+  it('should throw error for unsupported provider', () => {
+    const config = {
+      provider: 'unsupported' as any,
+      apiKey: 'test-key'
+    };
+    
+    expect(() => createModelClient(config)).toThrow(/Unsupported provider/);
+  });
+
+  it('should generate a structured object response', async () => {
+    const config: ModelConfig = {
+      provider: 'openai',
+      apiKey: 'test-key'
+    };
+    
+    const client = createModelClient(config);
+    const schema = z.object({
+      result: z.string()
+    });
+    
+    const response = await client.generateObject(schema, 'Test prompt');
+    expect(response).toEqual({ result: 'test response' });
   });
 });
