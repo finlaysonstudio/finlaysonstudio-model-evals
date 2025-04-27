@@ -27,3 +27,4 @@ A monorepo for evaluating LLM randomness and distributional behavior.
 - When requested, once verified, mark the task Verified
 - Log a message any time a task is added to Queued, Dequeued, or Verified
 - `echo "[Queued] Subject line of next task" >> .context.log`
+- Log messages to a hidden file, `.context.log`
