@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Implement model API interfaces using Vercel AI SDK with mocked API tests
 - Create packages/random-word directory structure
 - Initialize eval-random-words package
 - Set up structured output schemas with Zod for consistent response formatting
@@ -103,6 +102,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Implement model API interfaces using Vercel AI SDK with mocked API tests
 
 ### Verified
 - Define Mongoose schemas for data persistence with validation tests

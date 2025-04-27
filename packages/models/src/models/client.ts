@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { openai, createOpenAI } from '@ai-sdk/openai';
-import { anthropic, createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { generateText, generateObject } from 'ai';
 
 /**
  * Supported model providers
@@ -28,10 +29,58 @@ export interface ModelClient {
 /**
  * Default model names for each provider
  */
-const DEFAULT_MODEL_NAMES = {
+export const DEFAULT_MODEL_NAMES = {
   openai: 'gpt-4-turbo',
   anthropic: 'claude-3-sonnet-20240229',
 };
+
+/**
+ * Creates an API client for the specified provider
+ * This function is separated to make testing easier
+ */
+export function createApiClient(config: ModelConfig) {
+  const { provider, apiKey, baseURL } = config;
+  
+  switch (provider) {
+    case 'openai':
+      return createOpenAI({ apiKey, baseURL });
+    case 'anthropic':
+      return createAnthropic({ apiKey, baseURL });
+    default:
+      throw new Error(`Unsupported provider: ${provider}`);
+  }
+}
+
+/**
+ * Generate text response using the AI SDK
+ * This function is separated to make testing easier
+ */
+export async function generateTextResponse(model: any, prompt: string): Promise<string> {
+  const response = await generateText({
+    model,
+    prompt,
+  });
+  
+  return response.text;
+}
+
+/**
+ * Generate structured object using the AI SDK
+ * This function is separated to make testing easier
+ */
+export async function generateObjectResponse<T extends z.ZodTypeAny>(
+  model: any, 
+  schema: T, 
+  prompt: string
+): Promise<z.infer<T>> {
+  const response = await generateObject({
+    model,
+    prompt,
+    schema,
+  });
+  
+  return response.object;
+}
 
 /**
  * Creates a model client for the specified provider
@@ -39,51 +88,22 @@ const DEFAULT_MODEL_NAMES = {
  * @returns ModelClient
  */
 export function createModelClient(config: ModelConfig): ModelClient {
-  const { provider, apiKey, modelName, baseURL } = config;
+  const { provider, modelName } = config;
 
   // Determine the actual model name to use
   const actualModelName = modelName || DEFAULT_MODEL_NAMES[provider];
-
-  switch (provider) {
-    case 'openai': {
-      const client = createOpenAI({
-        apiKey,
-        baseURL,
-      });
-
-      return {
-        async generateResponse(prompt: string): Promise<string> {
-          // For the initial implementation, we'll use a simplified response method
-          // This is because the AI SDK doesn't expose the direct API client methods in the same way
-          return `Response to: ${prompt}`;
-        },
-        async generateObject<T extends z.ZodTypeAny>(schema: T, prompt: string): Promise<z.infer<T>> {
-          // Mock implementation for tests
-          return { result: 'test response', response: 'test response' } as z.infer<T>;
-        },
-      };
-    }
+  
+  // Create the appropriate API client
+  const apiClient = createApiClient(config);
+  
+  // Create and return the model client
+  return {
+    async generateResponse(prompt: string): Promise<string> {
+      return generateTextResponse(apiClient(actualModelName), prompt);
+    },
     
-    case 'anthropic': {
-      const client = createAnthropic({
-        apiKey,
-        baseURL,
-      });
-
-      return {
-        async generateResponse(prompt: string): Promise<string> {
-          // For the initial implementation, we'll use a simplified response method
-          // This is because the AI SDK doesn't expose the direct API client methods in the same way
-          return `Response to: ${prompt}`;
-        },
-        async generateObject<T extends z.ZodTypeAny>(schema: T, prompt: string): Promise<z.infer<T>> {
-          // Mock implementation for tests
-          return { result: 'test response', response: 'test response' } as z.infer<T>;
-        },
-      };
-    }
-    
-    default:
-      throw new Error(`Unsupported provider: ${provider}`);
-  }
+    async generateObject<T extends z.ZodTypeAny>(schema: T, prompt: string): Promise<z.infer<T>> {
+      return generateObjectResponse(apiClient(actualModelName), schema, prompt);
+    },
+  };
 }
