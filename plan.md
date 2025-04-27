@@ -107,10 +107,10 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
-- Install Vercel AI SDK and its dependencies (zod)
 
 ### Verified
 - Initialize root monorepo with package.json and npm workspace configuration
 - Set up TypeScript configuration for the project
 - Configure Vite for build process
 - Add Vitest for testing framework
+- Install Vercel AI SDK and its dependencies (zod)
