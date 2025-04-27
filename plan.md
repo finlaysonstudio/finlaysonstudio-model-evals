@@ -89,8 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Create packages/models directory structure
-- Initialize eval-models package
 - Define Mongoose schemas for data persistence with validation tests
 - Implement model API interfaces using Vercel AI SDK with mocked API tests
 - Create packages/random-word directory structure
@@ -114,3 +112,5 @@ This package will handle model interfaces and data persistence.
 - Add Vitest for testing framework
 - Install Vercel AI SDK and its dependencies (zod)
 - Create MongoDB connection configuration with tests
+- Create packages/models directory structure
+- Initialize eval-models package
