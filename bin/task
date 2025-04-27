@@ -1,5 +1,5 @@
 #!/bin/bash
-claude "
+cat context.md | claude "
 Read plan.md.
 Edit the plan and mark the first queued task as dequeued. 
 Complete that task. 
