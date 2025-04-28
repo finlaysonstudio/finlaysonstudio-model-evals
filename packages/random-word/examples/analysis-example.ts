@@ -4,6 +4,7 @@
 import { ModelClient } from '../src/types/model-client';
 import { TrackedEvaluationOptions, runTrackedEvaluation } from '../src/utils/tracking-utils';
 import { analyzeRandomness } from '../src/analysis/statistical-analysis';
+import { detectPositionBias, detectEdgePositionBias, detectWordPositionCorrelation } from '../src/analysis/position-bias';
 
 // Mock model client for example purposes
 const mockModel: ModelClient = {
@@ -80,6 +81,36 @@ async function runAnalysisExample() {
     console.log(`  Random Distribution: ${analysis.overallAssessment.isUniformDistribution ? 'Yes' : 'No'}`);
     console.log(`  Sequential Independence: ${analysis.overallAssessment.isSequentiallyIndependent ? 'Yes' : 'No'}`);
     console.log(`  Interpretation: ${analysis.overallAssessment.interpretation}`);
+    
+    // Add enhanced position bias detection
+    console.log('\n----- ENHANCED POSITION BIAS ANALYSIS -----');
+    
+    // Perform detailed position bias analysis
+    const positionBiasAnalysis = detectPositionBias(results.rawSelections);
+    console.log('\nPosition Bias Metrics:');
+    console.log(`  Bias Index: ${positionBiasAnalysis.biasMetrics.biasIndex.toFixed(3)} (0 = no bias, 1 = max bias)`);
+    console.log(`  Max Deviation: ${(positionBiasAnalysis.biasMetrics.maxDeviation * 100).toFixed(1)}% at position ${positionBiasAnalysis.biasMetrics.maxDeviationPosition}`);
+    console.log(`  Assessment: ${positionBiasAnalysis.biasAssessment.interpretation}`);
+    
+    // Analyze edge position effects (first/last position bias)
+    const edgeBiasAnalysis = detectEdgePositionBias(results.rawSelections);
+    console.log('\nEdge Position Effects:');
+    console.log(`  First Position Bias: ${(edgeBiasAnalysis.firstPositionBias * 100).toFixed(1)}%`);
+    console.log(`  Last Position Bias: ${(edgeBiasAnalysis.lastPositionBias * 100).toFixed(1)}%`);
+    console.log(`  Assessment: ${edgeBiasAnalysis.interpretation}`);
+    
+    // Analyze word-position correlations
+    const correlationAnalysis = detectWordPositionCorrelation(results.rawSelections);
+    console.log('\nWord-Position Correlations:');
+    if (correlationAnalysis.hasSignificantCorrelation) {
+      console.log('  Significant correlations detected:');
+      correlationAnalysis.significantCorrelations.slice(0, 3).forEach(corr => {
+        console.log(`    '${corr.word}' at position ${corr.position}: ${(corr.deviation * 100).toFixed(1)}% deviation`);
+      });
+    } else {
+      console.log('  No significant word-position correlations detected');
+    }
+    console.log(`  Assessment: ${correlationAnalysis.interpretation}`);
     
   } catch (error) {
     console.error('Error during evaluation:', error);
