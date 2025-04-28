@@ -88,9 +88,9 @@ console.log(`Chi-square value: ${stats.chiSquare}`);
 console.log(`Interpretation: ${stats.interpretation}`);
 ```
 
-## Types
+## Types and Schemas
 
-The package exports several TypeScript types:
+The package exports several TypeScript types and Zod schemas for structured output validation:
 
 ```typescript
 // Response from a single word selection
@@ -115,7 +115,30 @@ interface EvaluationResult {
 }
 ```
 
+### Zod Schemas
+
+The package provides Zod schemas for structured output validation:
+
+```typescript
+import { 
+  RandomWordSchema, 
+  SelectionRunSchema,
+  WordFrequencySchema,
+  PositionBiasSchema,
+  EvaluationResultSchema 
+} from '@finlaysonstudio/eval-random-words';
+
+// RandomWordSchema validates the model's response
+const response = { selectedWord: 'hearts', reason: 'This was chosen randomly' };
+const result = RandomWordSchema.parse(response);
+
+// All schemas can be used for validation and type inference
+type RandomWord = z.infer<typeof RandomWordSchema>;
+```
+
 ## Advanced Usage
+
+### Custom Word Options and Run Count
 
 You can customize the word options and the number of runs:
 
@@ -126,4 +149,46 @@ const customOptions = ['apple', 'banana', 'cherry', 'durian'];
 const numRuns = 500;
 
 const results = await evaluateRandomWordSelection(model, customOptions, numRuns);
+```
+
+### Structured Prompts with Zod
+
+The package includes utilities for creating structured prompts that work well with Vercel AI SDK:
+
+```typescript
+import { 
+  createStructuredPrompt, 
+  formatStructuredPrompt,
+  generateRandomWordWithStructuredOutput
+} from '@finlaysonstudio/eval-random-words';
+
+// Create a structured prompt with custom options
+const prompt = createStructuredPrompt({
+  wordOptions: ['red', 'blue', 'green', 'yellow'],
+  randomize: true,
+  includeInstructions: true
+});
+
+// Format the prompt for model consumption
+const formattedPrompt = formatStructuredPrompt(prompt);
+
+// Or use the helper function to generate a response directly
+const response = await generateRandomWordWithStructuredOutput(model, {
+  wordOptions: ['red', 'blue', 'green', 'yellow']
+});
+```
+
+### Custom Schemas
+
+You can create custom schemas for different word sets:
+
+```typescript
+import { createCustomRandomWordSchema } from '@finlaysonstudio/eval-random-words';
+
+// Create a schema for an array of colors
+const colors = ['red', 'blue', 'green', 'yellow'];
+const ColorSchema = createCustomRandomWordSchema(colors);
+
+// Use the schema with a model client
+const response = await model.generateObject(ColorSchema, prompt);
 ```

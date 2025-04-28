@@ -12,6 +12,7 @@ export * from './analysis';
 export * from './schemas';
 export * from './types';
 export * from './utils/array';
+export * from './utils/model-utils';
 
 /**
  * Creates a prompt with randomized word options
