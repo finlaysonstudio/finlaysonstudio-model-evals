@@ -100,9 +100,9 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
-- Initialize eval-random-words package
 
 ### Verified
+- Initialize eval-random-words package
 - Create packages/random-word directory structure
 - Implement model API interfaces using Vercel AI SDK with mocked API tests
 - Define Mongoose schemas for data persistence with validation tests
