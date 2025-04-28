@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DEFAULT_WORD_OPTIONS } from './random-word';
+import { shuffleArray } from '../utils/array';
 
 /**
  * Schema for the model prompt parameters
@@ -8,6 +9,7 @@ export const ModelPromptParamsSchema = z.object({
   wordOptions: z.array(z.string()).default([...DEFAULT_WORD_OPTIONS]),
   randomize: z.boolean().default(true),
   includeInstructions: z.boolean().default(true),
+  promptStyle: z.enum(['simple', 'structured', 'detailed']).default('structured'),
 });
 
 export type ModelPromptParams = z.infer<typeof ModelPromptParamsSchema>;
@@ -30,6 +32,11 @@ export const StructuredPromptSchema = z.object({
 export type StructuredPrompt = z.infer<typeof StructuredPromptSchema>;
 
 /**
+ * Styles of prompts available for random word selection
+ */
+export type PromptStyle = 'simple' | 'structured' | 'detailed';
+
+/**
  * Creates a standardized structured prompt for random word selection
  * 
  * @param params Configuration options for the prompt
@@ -42,15 +49,7 @@ export function createStructuredPrompt(
   const { wordOptions, randomize, includeInstructions } = validatedParams;
   
   // Use provided word options or defaults
-  const options = [...wordOptions];
-  
-  // Randomize order if requested
-  if (randomize) {
-    for (let i = options.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [options[i], options[j]] = [options[j], options[i]];
-    }
-  }
+  const options = randomize ? shuffleArray([...wordOptions]) : [...wordOptions];
   
   return {
     task: 'random word selection',
@@ -65,4 +64,38 @@ export function createStructuredPrompt(
       reason: ''
     }
   };
+}
+
+/**
+ * Creates a prompt string for simple random word selection
+ * 
+ * @param options Array of word options, possibly randomized
+ * @returns A simple prompt string for random word selection
+ */
+export function createSimplePrompt(options: string[]): string {
+  return `Choose a random word from the following list: ${options.join(', ')}`;
+}
+
+/**
+ * Creates a detailed prompt for random word selection
+ * 
+ * @param options Array of word options, possibly randomized
+ * @returns A detailed prompt string for random word selection
+ */
+export function createDetailedPrompt(options: string[]): string {
+  return `
+# Random Word Selection Task
+
+Please select one word from the following options, making your choice completely at random:
+
+${options.map((word, index) => `${index + 1}. ${word}`).join('\n')}
+
+Do not use any pattern, preference, or bias in making your selection. Your choice should be purely random.
+
+Respond with a JSON object containing:
+{
+  "selectedWord": "The word you randomly selected",
+  "reason": "A brief explanation of your random selection process"
+}
+`.trim();
 }

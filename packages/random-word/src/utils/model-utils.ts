@@ -7,6 +7,7 @@ import {
 } from '../schemas/model-prompt';
 import { RandomWordSchema, DEFAULT_WORD_OPTIONS } from '../schemas/random-word';
 import { RandomWordResponse } from '../types';
+import { shuffleArray } from './array';
 
 /**
  * Convert a structured prompt object to a formatted string for LLM consumption
@@ -35,6 +36,59 @@ export function formatStructuredPrompt(prompt: StructuredPrompt): string {
 }
 
 /**
+ * Generate a prompt for random word selection with customized presentation
+ * 
+ * @param options Array of words to choose from
+ * @param promptStyle Style of prompt to generate ('simple', 'structured', 'detailed')
+ * @returns A formatted prompt string with randomized word order
+ */
+export function generateRandomWordPrompt(
+  options: readonly string[] | string[] = [...DEFAULT_WORD_OPTIONS],
+  promptStyle: 'simple' | 'structured' | 'detailed' = 'simple'
+): string {
+  // Create a shuffled copy of the options
+  const shuffledOptions = shuffleArray([...options]);
+  
+  switch (promptStyle) {
+    case 'simple':
+      return `Choose a random word from the following list: ${shuffledOptions.join(', ')}`;
+      
+    case 'structured':
+      return formatStructuredPrompt({
+        task: 'random word selection',
+        context: {
+          options: shuffledOptions
+        },
+        instructions: 'Choose one word from the provided options completely at random. Do not use any pattern or preference. Your selection should be purely random.',
+        outputFormat: {
+          selectedWord: '',
+          reason: ''
+        }
+      });
+      
+    case 'detailed':
+      return `
+# Random Word Selection Task
+
+Please select one word from the following options, making your choice completely at random:
+
+${shuffledOptions.map((word, index) => `${index + 1}. ${word}`).join('\n')}
+
+Do not use any pattern, preference, or bias in making your selection. Your choice should be purely random.
+
+Respond with a JSON object containing:
+{
+  "selectedWord": "The word you randomly selected",
+  "reason": "A brief explanation of your random selection process"
+}
+`.trim();
+      
+    default:
+      return `Choose a random word from the following list: ${shuffledOptions.join(', ')}`;
+  }
+}
+
+/**
  * Generate a random word selection using structured output with Zod schemas
  * 
  * @param model The model client to use
@@ -51,6 +105,29 @@ export async function generateRandomWordWithStructuredOutput(
   
   // Use the model client to generate a structured response
   return await model.generateObject(RandomWordSchema, formattedPrompt);
+}
+
+/**
+ * Generate a random word selection using the provided model and customized prompt
+ * 
+ * @param model The model client to use
+ * @param options Word options to randomize and present
+ * @param promptStyle Style of prompt to generate
+ * @returns Promise resolving to the model's selection
+ */
+export async function generateRandomWordWithCustomPrompt(
+  model: ModelClient,
+  options: readonly string[] | string[] = [...DEFAULT_WORD_OPTIONS],
+  promptStyle: 'simple' | 'structured' | 'detailed' = 'simple'
+): Promise<RandomWordResponse> {
+  // Generate the appropriate prompt
+  const prompt = generateRandomWordPrompt(options, promptStyle);
+  
+  // Create a schema that accepts the specific options
+  const schema = createCustomRandomWordSchema(options);
+  
+  // Use the model client to generate a structured response
+  return await model.generateObject(schema, prompt);
 }
 
 /**

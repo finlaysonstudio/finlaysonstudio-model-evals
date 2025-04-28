@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Implement prompt generation with randomized word order + tests
 - Implement tracking and data collection for responses + tests
 - Add statistical analysis functions with accuracy tests
 - Implement position bias detection with validation tests
@@ -101,6 +100,7 @@ This package will handle model interfaces and data persistence.
 ### Dequeued
 
 ### Verified
+- Implement prompt generation with randomized word order + tests
 - Initialize eval-random-words package
 - Create packages/random-word directory structure
 - Implement model API interfaces using Vercel AI SDK with mocked API tests

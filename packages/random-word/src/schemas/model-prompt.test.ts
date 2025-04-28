@@ -2,9 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { 
   ModelPromptParamsSchema,
   StructuredPromptSchema, 
-  createStructuredPrompt
+  createStructuredPrompt,
+  createSimplePrompt,
+  createDetailedPrompt
 } from './model-prompt';
 import { DEFAULT_WORD_OPTIONS } from './random-word';
+import * as arrayUtils from '../utils/array';
 
 describe('Model Prompt Schemas', () => {
   describe('ModelPromptParamsSchema', () => {
@@ -12,7 +15,8 @@ describe('Model Prompt Schemas', () => {
       const validParams = {
         wordOptions: ['red', 'green', 'blue', 'yellow'],
         randomize: true,
-        includeInstructions: true
+        includeInstructions: true,
+        promptStyle: 'structured' as const
       };
       
       const result = ModelPromptParamsSchema.safeParse(validParams);
@@ -26,8 +30,23 @@ describe('Model Prompt Schemas', () => {
       expect(result).toEqual({
         wordOptions: [...DEFAULT_WORD_OPTIONS],
         randomize: true,
-        includeInstructions: true
+        includeInstructions: true,
+        promptStyle: 'structured'
       });
+    });
+
+    it('should validate prompt style options', () => {
+      const validStyles = ['simple', 'structured', 'detailed'];
+      validStyles.forEach(style => {
+        const params = { promptStyle: style };
+        const result = ModelPromptParamsSchema.safeParse(params);
+        expect(result.success).toBe(true);
+      });
+
+      // Invalid style
+      const invalidParams = { promptStyle: 'invalid' };
+      const result = ModelPromptParamsSchema.safeParse(invalidParams);
+      expect(result.success).toBe(false);
     });
   });
   
@@ -51,18 +70,17 @@ describe('Model Prompt Schemas', () => {
   });
   
   describe('createStructuredPrompt', () => {
-    // Mock Math.random to make tests deterministic
-    let randomSpy: any;
+    let shuffleArraySpy: any;
     
     beforeEach(() => {
-      const mockMath = Object.create(global.Math);
-      mockMath.random = () => 0.5;
-      randomSpy = vi.spyOn(global.Math, 'random').mockImplementation(() => 0.5);
-      global.Math = mockMath;
+      // Mock shuffleArray for deterministic tests
+      shuffleArraySpy = vi.spyOn(arrayUtils, 'shuffleArray').mockImplementation((arr) => {
+        return [...arr].reverse(); // Simple deterministic shuffle for testing
+      });
     });
     
     afterEach(() => {
-      randomSpy.mockRestore();
+      shuffleArraySpy.mockRestore();
     });
     
     it('should create a structured prompt with default options', () => {
@@ -80,10 +98,8 @@ describe('Model Prompt Schemas', () => {
         }
       });
       
-      // Check that all default options are present (though order may differ due to randomization)
-      DEFAULT_WORD_OPTIONS.forEach(option => {
-        expect(prompt.context.options).toContain(option);
-      });
+      // Check that all default options are present with reversed order due to our mock
+      expect(prompt.context.options).toEqual([...DEFAULT_WORD_OPTIONS].reverse());
     });
     
     it('should respect custom word options', () => {
@@ -93,9 +109,8 @@ describe('Model Prompt Schemas', () => {
       });
       
       expect(prompt.context.options).toHaveLength(customOptions.length);
-      customOptions.forEach(option => {
-        expect(prompt.context.options).toContain(option);
-      });
+      // Should be reversed due to our mocked shuffleArray
+      expect(prompt.context.options).toEqual([...customOptions].reverse());
     });
     
     it('should not randomize when randomize is false', () => {
@@ -105,8 +120,9 @@ describe('Model Prompt Schemas', () => {
         randomize: false
       });
       
-      // Order should be preserved
+      // Order should be preserved (not reversed)
       expect(prompt.context.options).toEqual(customOptions);
+      expect(shuffleArraySpy).not.toHaveBeenCalled();
     });
     
     it('should exclude instructions when includeInstructions is false', () => {
@@ -115,6 +131,37 @@ describe('Model Prompt Schemas', () => {
       });
       
       expect(prompt.instructions).toBe('');
+    });
+  });
+
+  describe('createSimplePrompt', () => {
+    it('should create a simple prompt with the provided options', () => {
+      const options = ['clubs', 'diamonds', 'hearts', 'spades'];
+      const prompt = createSimplePrompt(options);
+      
+      expect(prompt).toBe('Choose a random word from the following list: clubs, diamonds, hearts, spades');
+    });
+    
+    it('should handle empty options array', () => {
+      const prompt = createSimplePrompt([]);
+      
+      expect(prompt).toBe('Choose a random word from the following list: ');
+    });
+  });
+  
+  describe('createDetailedPrompt', () => {
+    it('should create a detailed prompt with numbered options', () => {
+      const options = ['clubs', 'diamonds', 'hearts', 'spades'];
+      const prompt = createDetailedPrompt(options);
+      
+      expect(prompt).toContain('# Random Word Selection Task');
+      expect(prompt).toContain('1. clubs');
+      expect(prompt).toContain('2. diamonds');
+      expect(prompt).toContain('3. hearts');
+      expect(prompt).toContain('4. spades');
+      expect(prompt).toContain('making your choice completely at random');
+      expect(prompt).toContain('selectedWord');
+      expect(prompt).toContain('reason');
     });
   });
 });
