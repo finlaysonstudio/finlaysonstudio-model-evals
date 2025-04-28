@@ -89,11 +89,11 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Set up MongoDB integration for storing evaluation results with integration tests
 - Implement model provider abstraction using Vercel AI SDK
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Set up MongoDB integration for storing evaluation results with integration tests
 - Implement position bias detection with validation tests
 - Implement tracking and data collection for responses + tests
 - Add statistical analysis functions with accuracy tests

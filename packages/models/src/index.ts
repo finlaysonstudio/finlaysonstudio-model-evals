@@ -1,11 +1,5 @@
 // Export database configuration
 export * from './config/database';
 
-// Export model client
-export * from './models/client';
-
-// Export response tracker
-export * from './models/response-tracker';
-
-// Export schemas
-export * from './models/schemas';
+// Export models module (client, repository, service, schemas, tracker)
+export * from './models';
