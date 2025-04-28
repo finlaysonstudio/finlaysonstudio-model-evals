@@ -1,6 +1,6 @@
 {
   "name": "finlaysonstudio-model-evals",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A monorepo for evaluating LLM randomness and distributional behavior.",
   "private": true,
   "workspaces": [

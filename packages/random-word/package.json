@@ -1,6 +1,6 @@
 {
   "name": "@finlaysonstudio/eval-random-words",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Tests a model's ability to select random words",
   "type": "module",
   "main": "dist/index.js",
@@ -22,9 +22,9 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
-    "@finlaysonstudio/eval-models": "1.0.0"
+    "@finlaysonstudio/eval-models": "0.0.1"
   },
   "peerDependencies": {
-    "@finlaysonstudio/eval-models": "1.0.0"
+    "@finlaysonstudio/eval-models": "0.0.1"
   }
 }

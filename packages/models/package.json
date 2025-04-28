@@ -1,6 +1,6 @@
 {
   "name": "@finlaysonstudio/eval-models",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Model interfaces and data persistence for LLM evaluations",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
