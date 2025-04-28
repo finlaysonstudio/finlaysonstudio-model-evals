@@ -19,6 +19,8 @@ export * from './schemas';
 export * from './types';
 export * from './utils/array';
 export * from './utils/model-utils';
+import { runTrackedEvaluation } from './utils/tracking-utils';
+export * from './utils/tracking-utils';
 
 /**
  * Creates a prompt with randomized word options
@@ -83,19 +85,63 @@ export async function runSingleEvaluation(
 }
 
 /**
+ * Options for evaluation
+ */
+export interface EvaluationOptions {
+  options?: readonly string[] | string[];
+  numRuns?: number;
+  promptStyle?: PromptStyle;
+  tracking?: {
+    enabled: boolean;
+    name: string;
+    description?: string;
+    modelProvider: 'openai' | 'anthropic';
+    modelName: string;
+  };
+}
+
+/**
  * Runs multiple evaluations and collects statistics on randomness
  * @param model The model client to use
- * @param options Array of word options to choose from
- * @param numRuns Number of evaluation runs to perform
- * @param promptStyle Style of prompt to use for evaluations
+ * @param evalOptions Configuration options for the evaluation
  * @returns Promise resolving to evaluation results with statistics
  */
 export async function evaluateRandomWordSelection(
   model: ModelClient,
-  options: readonly string[] | string[] = [...DEFAULT_WORD_OPTIONS],
-  numRuns: number = 100,
-  promptStyle: PromptStyle = 'simple'
+  evalOptions: EvaluationOptions = {}
 ): Promise<EvaluationResult> {
+  const { 
+    options = [...DEFAULT_WORD_OPTIONS],
+    numRuns = 100,
+    promptStyle = 'simple',
+    tracking
+  } = evalOptions;
+
+  // Use tracking if enabled
+  if (tracking?.enabled) {
+    const { results } = await runTrackedEvaluation(model, {
+      name: tracking.name,
+      description: tracking.description,
+      modelProvider: tracking.modelProvider,
+      modelName: tracking.modelName,
+      wordOptions: options,
+      numRuns,
+      promptStyle
+    });
+
+    // Calculate statistics using the tracked results
+    const selectedWords = calculateWordFrequency(results.rawSelections);
+    const positionBias = calculatePositionBias(results.rawSelections);
+    
+    return {
+      selectedWords,
+      positionBias,
+      totalRuns: numRuns,
+      rawSelections: results.rawSelections
+    };
+  }
+  
+  // Non-tracking implementation (original behavior)
   const selections: SelectionRun[] = [];
   
   // Run the specified number of evaluations

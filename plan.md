@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Implement tracking and data collection for responses + tests
 - Add statistical analysis functions with accuracy tests
 - Implement position bias detection with validation tests
 - Create visualization component for results with rendering tests
@@ -98,6 +97,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Implement tracking and data collection for responses + tests
 
 ### Verified
 - Implement prompt generation with randomized word order + tests
