@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Create visualization component for results with rendering tests
 - Set up MongoDB integration for storing evaluation results with integration tests
 - Implement model provider abstraction using Vercel AI SDK
 - Create documentation and usage examples with AI SDK integration samples
@@ -114,3 +113,7 @@ This package will handle model interfaces and data persistence.
 - Create packages/models directory structure
 - Initialize eval-models package
 - Set up structured output schemas with Zod for consistent response formatting
+
+### Canceled
+- Create visualization component for results with rendering tests
+  - _No need for a front-end at this time_
