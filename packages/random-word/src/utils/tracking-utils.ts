@@ -7,6 +7,8 @@ import {
   SelectionRun 
 } from '../types';
 import { runSingleEvaluation } from '../index';
+import { calculateWordFrequency } from '../analysis/word-frequency';
+import { calculatePositionBias } from '../analysis/position-bias';
 
 /**
  * Options for tracked evaluations
@@ -153,7 +155,14 @@ export async function runTrackedEvaluation(
       selections.push(result);
     }
     
-    // Calculate statistics (handled by the caller using existing analytics)
+    // Calculate statistics using our analysis functions
+    const wordFrequency = calculateWordFrequency(
+      selections.map(s => ({ word: s.word }))
+    );
+    
+    const positionBias = calculatePositionBias(
+      selections.map(s => ({ word: s.word, position: s.position }))
+    );
     
     // Update the status to completed
     await ResponseTracker.updateEvaluationRunStatus(
@@ -164,8 +173,8 @@ export async function runTrackedEvaluation(
     return {
       evaluationRunId: evaluationRun._id.toString(),
       results: {
-        selectedWords: {}, // These will be calculated by the caller
-        positionBias: {}, // These will be calculated by the caller
+        selectedWords: wordFrequency,
+        positionBias,
         totalRuns: numRuns,
         rawSelections: selections
       }

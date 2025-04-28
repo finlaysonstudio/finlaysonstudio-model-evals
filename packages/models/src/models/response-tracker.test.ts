@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, MockInstance } from 'vitest';
 import mongoose from 'mongoose';
 import { ResponseTracker } from './response-tracker';
 import { ModelResponse } from './schemas/model-response';
@@ -36,7 +36,7 @@ class MockEvaluationRunModel {
   _id: mongoose.Types.ObjectId;
   name: string;
   status: string;
-  save: jest.Mock;
+  save: MockInstance;
   
   constructor(name: string, options: any) {
     this._id = new mongoose.Types.ObjectId();
