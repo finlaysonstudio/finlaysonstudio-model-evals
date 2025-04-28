@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Initialize eval-random-words package
 - Set up structured output schemas with Zod for consistent response formatting
 - Implement prompt generation with randomized word order + tests
 - Implement tracking and data collection for responses + tests
@@ -101,6 +100,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Initialize eval-random-words package
 
 ### Verified
 - Create packages/random-word directory structure
