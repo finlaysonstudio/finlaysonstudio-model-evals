@@ -89,7 +89,6 @@ This package will handle model interfaces and data persistence.
 **Note: Each implementation task should include appropriate unit tests using Vitest**
 
 ### Queued
-- Create packages/random-word directory structure
 - Initialize eval-random-words package
 - Set up structured output schemas with Zod for consistent response formatting
 - Implement prompt generation with randomized word order + tests
@@ -102,6 +101,7 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
+- Create packages/random-word directory structure
 - Implement model API interfaces using Vercel AI SDK with mocked API tests
 
 ### Verified

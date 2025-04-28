@@ -1,7 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { shuffleArray, getPromptWithRandomizedOptions, getRandomWordSelection, RandomWordSchema } from '../src/index';
-import { ModelClient } from '@finlaysonstudio/eval-models';
-import { z } from 'zod';
+import { 
+  shuffleArray, 
+  getPromptWithRandomizedOptions, 
+  getRandomWordSelection 
+} from '../src/index';
+import { RandomWordSchema } from '../src/schemas/random-word';
+import { calculateWordFrequency } from '../src/analysis/word-frequency';
+import { calculatePositionBias } from '../src/analysis/position-bias';
+import { ModelClient } from '../src/types/model-client';
 
 describe('shuffleArray', () => {
   it('should return an array of the same length', () => {
@@ -87,6 +93,46 @@ describe('getRandomWordSelection', () => {
     expect(result).toEqual({
       selectedWord: 'clubs',
       reason: 'test reason'
+    });
+  });
+});
+
+describe('Analysis functions', () => {
+  describe('calculateWordFrequency', () => {
+    it('should correctly count word occurrences', () => {
+      const selections = [
+        { word: 'hearts' },
+        { word: 'clubs' },
+        { word: 'hearts' },
+        { word: 'diamonds' }
+      ];
+      
+      const result = calculateWordFrequency(selections);
+      
+      expect(result).toEqual({
+        hearts: 2,
+        clubs: 1,
+        diamonds: 1
+      });
+    });
+  });
+  
+  describe('calculatePositionBias', () => {
+    it('should correctly count position occurrences', () => {
+      const selections = [
+        { word: 'hearts', position: 2 },
+        { word: 'clubs', position: 0 },
+        { word: 'hearts', position: 3 },
+        { word: 'diamonds', position: 0 }
+      ];
+      
+      const result = calculatePositionBias(selections);
+      
+      expect(result).toEqual({
+        0: 2,
+        2: 1,
+        3: 1
+      });
     });
   });
 });

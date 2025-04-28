@@ -1,29 +1,31 @@
-import { z } from 'zod';
-import { ModelClient } from '@finlaysonstudio/eval-models';
+/**
+ * Entry point for the random-word evaluation package
+ */
+import { ModelClient } from './types/model-client';
+import { shuffleArray } from './utils/array';
+import { RandomWordResponse } from './types';
+import { RandomWordSchema } from './schemas/random-word';
+export * from './analysis';
+export * from './schemas';
+export * from './types';
+export * from './utils/array';
 
-export function shuffleArray<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
+/**
+ * Creates a prompt with randomized word options
+ * @param options Array of words to randomize
+ * @returns A prompt string with shuffled options
+ */
 export function getPromptWithRandomizedOptions(options: string[]): string {
   const shuffledOptions = shuffleArray(options);
   return `Choose a random word from the following list: ${shuffledOptions.join(', ')}`;
 }
 
-// Define the output schema for random word selection
-export const RandomWordSchema = z.object({
-  selectedWord: z.string(),
-  reason: z.string().optional(),
-});
-
-export type RandomWordResponse = z.infer<typeof RandomWordSchema>;
-
-// Function to get random word selection from a model
+/**
+ * Function to get random word selection from a model
+ * @param model The model client to use
+ * @param options Array of word options to choose from
+ * @returns Promise resolving to the model's selection
+ */
 export async function getRandomWordSelection(
   model: ModelClient, 
   options: string[]
