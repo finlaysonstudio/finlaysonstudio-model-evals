@@ -99,7 +99,6 @@ This package will handle model interfaces and data persistence.
 - Create documentation and usage examples with AI SDK integration samples
 
 ### Dequeued
-- Set up structured output schemas with Zod for consistent response formatting
 
 ### Verified
 - Initialize eval-random-words package
@@ -114,3 +113,4 @@ This package will handle model interfaces and data persistence.
 - Create MongoDB connection configuration with tests
 - Create packages/models directory structure
 - Initialize eval-models package
+- Set up structured output schemas with Zod for consistent response formatting
