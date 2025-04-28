@@ -13,6 +13,7 @@ A monorepo for evaluating LLM randomness and distributional behavior.
 - Modern TypeScript best practices
 - ESM modules (use import/export syntax)
 - Vitest for testing (describe/it structure)
+- Unit tests peers in directory with implementation
 - Monorepo structure with workspace references
 
 ## Workflow

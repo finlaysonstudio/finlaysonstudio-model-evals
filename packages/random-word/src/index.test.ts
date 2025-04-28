@@ -5,12 +5,12 @@ import {
   getRandomWordSelection,
   runSingleEvaluation,
   evaluateRandomWordSelection 
-} from '../src/index';
-import { RandomWordSchema, DEFAULT_WORD_OPTIONS } from '../src/schemas/random-word';
-import { calculateWordFrequency } from '../src/analysis/word-frequency';
-import { calculatePositionBias } from '../src/analysis/position-bias';
-import { calculateChiSquare } from '../src/analysis';
-import { ModelClient } from '../src/types/model-client';
+} from './index';
+import { RandomWordSchema, DEFAULT_WORD_OPTIONS } from './schemas/random-word';
+import { calculateWordFrequency } from './analysis/word-frequency';
+import { calculatePositionBias } from './analysis/position-bias';
+import { calculateChiSquare } from './analysis';
+import { ModelClient } from './types/model-client';
 
 describe('shuffleArray', () => {
   it('should return an array of the same length', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createModelClient, ModelConfig, DEFAULT_MODEL_NAMES } from '../src/models/client';
+import { createModelClient, ModelConfig, DEFAULT_MODEL_NAMES } from './client';
 import { z } from 'zod';
 
 // Import mocked modules

@@ -21,4 +21,13 @@ TypeScript/Node.js monorepo using:
 - MongoDB for persistence
 - Vitest for testing
 
+## Testing
+
+This project follows a co-location testing approach where test files are located next to the files they test:
+
+- Tests are written using Vitest
+- Test files use the naming pattern: `*.test.ts`
+- Test files are placed in the same directory as the file they test
+- Run tests with `npm test`
+
 Generated with 🩶 and the MIT license.

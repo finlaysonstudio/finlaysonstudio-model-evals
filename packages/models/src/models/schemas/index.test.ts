@@ -3,7 +3,7 @@ import {
   EvaluationRunStatus, 
   EvaluationRunType,
   AnalysisResultType
-} from '../src/models/schemas';
+} from './index';
 
 // We'll focus on testing the constants and enums since the actual schema
 // validation would require a real MongoDB connection

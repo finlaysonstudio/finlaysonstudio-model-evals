@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import mongoose from 'mongoose';
-import { connectToDatabase, disconnectFromDatabase, DatabaseConnectionOptions } from '../src/config/database';
+import { connectToDatabase, disconnectFromDatabase, DatabaseConnectionOptions } from './database';
 
 // Mock mongoose
 vi.mock('mongoose', () => {
