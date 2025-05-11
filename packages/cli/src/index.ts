@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { wordsCommand } from './commands/words.js';
-import { version } from '../package.json';
+import packageJson from '../package.json' assert { type: 'json' };
+const version = packageJson.version;
 import { setupDebug } from './utils/debug.js';
 
 // Create the main program
