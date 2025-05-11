@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "@finlaysonstudio/eval-models-cli",
   "version": "0.0.1",
   "description": "Command-line interface for model evaluations",
   "type": "module",
