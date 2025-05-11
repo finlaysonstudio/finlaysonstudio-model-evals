@@ -27,7 +27,7 @@ We'll create a new package called `cli` within the project's packages directory.
 
 ## Tasks
 
-1. **Setup CLI Package Structure** - _Queued_
+1. **Setup CLI Package Structure** - _Dequeued_
    - Create a new package directory at `packages/cli`
    - Initialize package.json with appropriate dependencies
    - Set up TypeScript configuration

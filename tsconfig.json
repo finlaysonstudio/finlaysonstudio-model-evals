@@ -16,6 +16,7 @@
   "include": ["**/*.ts", "**/*.tsx"],
   "references": [
     { "path": "./packages/models" },
-    { "path": "./packages/random-word" }
+    { "path": "./packages/random-word" },
+    { "path": "./packages/cli" }
   ]
 }
