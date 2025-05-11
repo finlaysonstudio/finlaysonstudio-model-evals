@@ -28,10 +28,11 @@ MONGODB_URI=your_mongodb_connection_string
 
 ## Core Packages
 
-The project consists of two main packages:
+The project consists of three main packages:
 
 1. **eval-models**: Handles model interfaces and data persistence
 2. **eval-random-words**: Tests a model's ability to select random words
+3. **eval-models-cli**: Command-line interface for running model evaluations
 
 ## Using eval-models
 
@@ -362,6 +363,54 @@ process.env.DEBUG = 'eval-models:*,eval-random-words:*';
 // Create evaluation service with debugging
 const evaluationService = new EvaluationService({ debug: true });
 ```
+
+## Using eval-models-cli
+
+The eval-models-cli package provides a convenient command-line interface for running model evaluations without writing code.
+
+### Installation
+
+```bash
+# Install globally
+npm install -g @finlaysonstudio/eval-models-cli
+
+# Or install in a specific workspace
+npm install -w your-workspace-name @finlaysonstudio/eval-models-cli
+```
+
+### Basic Usage
+
+```bash
+# Get help
+evals --help
+
+# Run a random word evaluation with default settings
+evals words
+
+# Run with custom parameters
+evals words --count 20 --words "paper,rock,scissors" --format json
+
+# Enable tracking to store results in the database
+evals words --tracking --count 100 --model-provider openai
+```
+
+### Available Commands
+
+Currently, the CLI supports the following commands:
+
+- `words`: Run random word selection evaluations
+
+### Common Options
+
+- `--count, -c`: Number of evaluation iterations to run
+- `--words, -w`: Comma-separated list of words to use
+- `--format, -f`: Output format (table, json, csv, compact)
+- `--tracking, -t`: Enable database tracking
+- `--model-provider`: Model provider to use (openai, anthropic)
+- `--api-key`: API key for the selected provider
+- `--debug, -d`: Enable debug output
+
+For more details, see the [CLI package README](../packages/cli/README.md).
 
 ## Resources
 

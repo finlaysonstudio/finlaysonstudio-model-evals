@@ -61,7 +61,7 @@ We'll create a new package called `cli` within the project's packages directory.
    - Verify correct output formats
    - Test error conditions and handling
 
-6. **Documentation and Finalization** - _Queued_
+6. **Documentation and Finalization** - _Dequeued_
    - Add README for CLI package
    - Document available commands and options
    - Include example usage

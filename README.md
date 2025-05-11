@@ -44,6 +44,16 @@ Tests a model's ability to select random words, analyzing potential biases in se
 - Implements position bias detection and statistical analysis
 - Provides comprehensive statistical tests (chi-square, entropy, runs test)
 
+### `@finlaysonstudio/eval-models-cli`
+
+Command-line interface for running model evaluations.
+
+- Simple CLI for executing evaluations without writing code
+- Supports random word selection evaluations via the `words` command
+- Configurable parameters for evaluation count, word list, and output format
+- Multiple output formats: table, JSON, CSV, and compact
+- Optional database integration for storing evaluation results
+
 ## Tracking Results
 
 The project includes a comprehensive system for tracking and analyzing evaluation results:
@@ -121,6 +131,8 @@ await evaluationService.saveAnalysisResult({
 
 ## Example Usage
 
+### Programmatic API
+
 ```typescript
 import { createModelClient } from '@finlaysonstudio/eval-models';
 import { evaluateRandomWordSelection } from '@finlaysonstudio/eval-random-words';
@@ -146,6 +158,22 @@ const results = await evaluateRandomWordSelection(model, {
 
 console.log(`Word frequencies:`, results.selectedWords);
 console.log(`Position bias:`, results.positionBias);
+```
+
+### Command Line Interface
+
+```bash
+# Install the CLI
+npm install -g @finlaysonstudio/eval-models-cli
+
+# Run a basic evaluation
+evals words
+
+# Run with custom parameters
+evals words --count 50 --words "apple,banana,cherry,durian" --format json
+
+# Run with tracking enabled
+evals words --tracking --model-provider openai --count 100
 ```
 
 ## Testing
