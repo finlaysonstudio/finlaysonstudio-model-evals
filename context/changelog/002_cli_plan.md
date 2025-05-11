@@ -41,7 +41,7 @@ We'll create a new package called `cli` within the project's packages directory.
    - Add debugging utilities
    - Write tests for basic CLI functionality
 
-3. **Implement "words" Evaluation Command** - _Queued_
+3. **Implement "words" Evaluation Command** - _Dequeued_
    - Create command handler for "words" evaluation
    - Implement parameter parsing for count and words options
    - Connect to existing evaluation infrastructure
