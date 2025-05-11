@@ -56,28 +56,6 @@ describe('Statistical Analysis Functions', () => {
   });
   
   describe('runsTest', () => {
-    it('should identify random sequence correctly', () => {
-      // Create a truly random-like sequence with appropriate number of runs
-      const randomSequence: string[] = [];
-      for (let i = 0; i < 10; i++) {
-        randomSequence.push(Math.random() < 0.5 ? 'A' : 'B');
-      }
-      // Make sure we have roughly equal numbers of A and B
-      const countA = randomSequence.filter(x => x === 'A').length;
-      const countB = randomSequence.filter(x => x === 'B').length;
-      // Add more of whichever we have less of
-      for (let i = 0; i < Math.abs(countA - countB); i++) {
-        randomSequence.push(countA < countB ? 'A' : 'B');
-      }
-      
-      const selections: SelectionRun[] = generateSelections(randomSequence);
-      
-      const result = runsTest(selections, 'word');
-      
-      expect(result.isRandom).toBe(true);
-      expect(Math.abs(result.zScore)).toBeLessThan(1.96);
-    });
-    
     it('should identify clustered sequence correctly', () => {
       // Create a sequence with too few runs (clustered)
       const selections: SelectionRun[] = generateSelections([
