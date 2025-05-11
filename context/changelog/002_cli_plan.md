@@ -55,7 +55,7 @@ We'll create a new package called `cli` within the project's packages directory.
    - Implement proper exit codes
    - Write tests for output formatting
 
-5. **Add Integration Tests** - _Queued_
+5. **Add Integration Tests** - _Dequeued_
    - Create end-to-end tests for CLI
    - Test different parameter combinations
    - Verify correct output formats
