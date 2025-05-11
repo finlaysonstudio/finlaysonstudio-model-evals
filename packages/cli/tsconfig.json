@@ -12,8 +12,10 @@
     "declaration": true,
     "sourceMap": true,
     "rootDir": "./src",
-    "composite": true
+    "composite": true,
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "lib": ["ES2020", "DOM"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules", "dist", "tests"]
 }

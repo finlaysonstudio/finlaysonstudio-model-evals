@@ -34,7 +34,7 @@ We'll create a new package called `cli` within the project's packages directory.
    - Install Commander.js for CLI argument parsing
    - Create basic entry point file structure
 
-2. **Implement Basic CLI Framework** - _Queued_
+2. **Implement Basic CLI Framework** - _Dequeued_
    - Create CLI entry point
    - Set up Commander.js command structure
    - Implement help text and version information
