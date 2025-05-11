@@ -48,7 +48,7 @@ We'll create a new package called `cli` within the project's packages directory.
    - Add input validation and error handling
    - Write tests for "words" command functionality
 
-4. **Implement Results Formatting and Output** - _Queued_
+4. **Implement Results Formatting and Output** - _Dequeued_
    - Create formatters for evaluation results
    - Implement console output formatting
    - Add support for different output formats (JSON, table, etc.)

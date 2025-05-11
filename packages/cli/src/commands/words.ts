@@ -11,17 +11,18 @@ import {
   EvaluationOptions,
   PromptStyle
 } from '@finlaysonstudio/eval-random-word';
-import { formatAsTable, formatAsJson } from '../utils/formatting.js';
+import { formatOutput, OutputFormat } from '../utils/formatting.js';
 
 interface WordsOptions {
   count?: number;
   words?: string;
   promptStyle?: string;
   tracking?: boolean;
-  format?: string;
+  format?: OutputFormat;
   modelProvider?: string;
   modelName?: string;
   apiKey?: string;
+  quiet?: boolean;
 }
 
 /**
@@ -35,7 +36,8 @@ export function wordsCommand(program: Command): void {
     .option('-w, --words <string>', 'comma-separated list of words to use in evaluation')
     .option('-p, --prompt-style <style>', 'prompt style to use (simple, structured, detailed)', validatePromptStyle)
     .option('-t, --tracking', 'enable tracking in database', false)
-    .option('-f, --format <format>', 'output format (table, json)', 'table')
+    .option('-f, --format <format>', 'output format (table, json, csv, compact)', validateOutputFormat, 'table')
+    .option('-q, --quiet', 'reduce verbosity of output', false)
     .option('--model-provider <provider>', 'model provider (openai, anthropic)', 'anthropic')
     .option('--model-name <name>', 'model name to use')
     .option('--api-key <key>', 'API key for the model provider (defaults to env var based on provider)')
@@ -56,12 +58,14 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
     const tracking = options.tracking || false;
     const format = options.format || 'table';
     const modelProvider = options.modelProvider || 'anthropic';
+    const quiet = options.quiet || false;
 
     debug(`Evaluation count: ${count}`);
     debug(`Using words: ${words.join(', ')}`);
     debug(`Prompt style: ${promptStyle}`);
     debug(`Tracking enabled: ${tracking}`);
     debug(`Output format: ${format}`);
+    debug(`Quiet mode: ${quiet}`);
     debug(`Model provider: ${modelProvider}`);
 
     // Get API key from options or environment variables
@@ -76,7 +80,7 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
 
     if (!apiKey) {
       console.error(`No API key provided for ${modelProvider}. Please provide an API key using --api-key or set the appropriate environment variable.`);
-      process.exit(1);
+      process.exit(1); // Exit with error code
     }
 
     // Connect to database if tracking is enabled
@@ -90,7 +94,7 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
         console.log('Connected to database.');
       } catch (error) {
         console.error('Failed to connect to database. Make sure MongoDB is running and MONGODB_URI is set correctly.', error);
-        process.exit(1);
+        process.exit(2); // Exit with database error code
       }
     }
 
@@ -123,18 +127,24 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
     }
 
     // Run the evaluation
-    console.log('Starting word evaluation...');
-    console.log(`Evaluating ${count} runs with words: [${words.join(', ')}]`);
+    if (!quiet) {
+      console.log('Starting word evaluation...');
+      console.log(`Evaluating ${count} runs with words: [${words.join(', ')}]`);
+    }
 
     const startTime = Date.now();
     const result = await evaluateRandomWordSelection(modelClient, evalOptions);
     const endTime = Date.now();
     const duration = (endTime - startTime) / 1000;
 
-    console.log(`\nEvaluation completed in ${duration.toFixed(2)} seconds.`);
+    if (!quiet) {
+      console.log(`\nEvaluation completed in ${duration.toFixed(2)} seconds.`);
+    }
 
     // Process and display results
-    console.log('\nWord Selection Results:');
+    if (!quiet) {
+      console.log('\nWord Selection Results:');
+    }
 
     // Format word frequency data
     const wordFrequencyData = Object.entries(result.selectedWords).map(([word, count]) => ({
@@ -150,33 +160,71 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
       Percentage: `${(((count as number) / result.totalRuns) * 100).toFixed(2)}%`
     }));
 
+    // Prepare complete result data
+    const resultData = {
+      metadata: {
+        totalRuns: result.totalRuns,
+        words: words,
+        duration: `${duration.toFixed(2)} seconds`,
+        model: options.modelName || 'default',
+        provider: modelProvider
+      },
+      wordFrequency: result.selectedWords,
+      positionBias: result.positionBias,
+      // The detailed run data is not available in the EvaluationResult type
+  rawDetails: []
+    };
+
     // Display results in selected format
     if (format === 'json') {
-      console.log(formatAsJson({
-        metadata: {
-          totalRuns: result.totalRuns,
-          words: words,
-          duration: `${duration.toFixed(2)} seconds`
-        },
-        wordFrequency: result.selectedWords,
-        positionBias: result.positionBias,
-      }));
+      console.log(formatOutput(resultData, 'json'));
+    } else if (format === 'csv') {
+      console.log('\nWord Frequency:');
+      console.log(formatOutput(wordFrequencyData, 'csv'));
+
+      console.log('\nPosition Bias:');
+      console.log(formatOutput(positionBiasData, 'csv'));
+    } else if (format === 'compact') {
+      console.log('\nWord Frequency:');
+      console.log(formatOutput(wordFrequencyData, 'compact'));
+
+      console.log('\nPosition Bias:');
+      console.log(formatOutput(positionBiasData, 'compact'));
     } else {
       // Default to table format
       console.log('\nWord Frequency:');
-      console.log(formatAsTable(wordFrequencyData));
+      console.log(formatOutput(wordFrequencyData, 'table'));
 
       console.log('\nPosition Bias:');
-      console.log(formatAsTable(positionBiasData));
+      console.log(formatOutput(positionBiasData, 'table'));
+
+      // Show summary stats in non-quiet mode
+      if (!quiet) {
+        console.log('\nSummary:');
+        const summary = [
+          { Metric: 'Total Runs', Value: result.totalRuns },
+          { Metric: 'Duration', Value: `${duration.toFixed(2)} seconds` },
+          { Metric: 'Model', Value: options.modelName || 'default' },
+          { Metric: 'Provider', Value: modelProvider }
+        ];
+        console.log(formatOutput(summary, 'table'));
+      }
     }
 
     // Disconnect from database if we connected
     if (tracking) {
-      console.log('Disconnecting from database...');
+      if (!quiet) {
+        console.log('Disconnecting from database...');
+      }
       await disconnectFromDatabase();
     }
 
-    console.log('\nEvaluation complete!');
+    if (!quiet) {
+      console.log('\nEvaluation complete!');
+    }
+
+    // Exit with success code
+    process.exit(0);
 
   } catch (error) {
     console.error('Error executing words evaluation:', error);
@@ -188,7 +236,7 @@ async function executeWordsCommand(options: WordsOptions): Promise<void> {
       // Ignore disconnect errors during cleanup
     }
 
-    process.exit(1);
+    process.exit(3); // Exit with general evaluation error code
   }
 }
 
@@ -212,4 +260,15 @@ function validatePromptStyle(value: string): string {
     throw new Error(`Invalid prompt style: ${value}. Must be one of: ${validStyles.join(', ')}`);
   }
   return value;
+}
+
+/**
+ * Validate output format option
+ */
+function validateOutputFormat(value: string): OutputFormat {
+  const validFormats: OutputFormat[] = ['table', 'json', 'csv', 'compact'];
+  if (!validFormats.includes(value as OutputFormat)) {
+    throw new Error(`Invalid output format: ${value}. Must be one of: ${validFormats.join(', ')}`);
+  }
+  return value as OutputFormat;
 }

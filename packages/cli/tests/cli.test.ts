@@ -93,7 +93,8 @@ describe('CLI commands', () => {
 
       expect(program.option).toHaveBeenCalledWith(
         '-f, --format <format>',
-        'output format (table, json)',
+        'output format (table, json, csv, compact)',
+        expect.any(Function),
         'table'
       );
 
@@ -105,7 +106,7 @@ describe('CLI commands', () => {
 
       // This is no longer an exact match since the order of calls can vary
       // Instead verify all required options were called
-      expect(program.option).toHaveBeenCalledTimes(8);
+      expect(program.option).toHaveBeenCalledTimes(9);
 
       // Verify specific options using partial matchers
       const calls = vi.mocked(program.option).mock.calls;
@@ -137,6 +138,28 @@ describe('CLI commands', () => {
             expect(() => validator('structured')).not.toThrow();
             expect(() => validator('detailed')).not.toThrow();
             expect(() => validator('invalid')).toThrow('Invalid prompt style: invalid');
+          }
+          return program;
+        }),
+        action: vi.fn().mockReturnThis(),
+      } as unknown as Command;
+
+      wordsCommand(program);
+    });
+
+    it('should validate output format correctly', () => {
+      // Extract the validator function
+      const program = {
+        command: vi.fn().mockReturnThis(),
+        description: vi.fn().mockReturnThis(),
+        option: vi.fn().mockImplementation((flag, desc, validator) => {
+          if (flag === '-f, --format <format>') {
+            // Test the validator with valid and invalid values
+            expect(() => validator('table')).not.toThrow();
+            expect(() => validator('json')).not.toThrow();
+            expect(() => validator('csv')).not.toThrow();
+            expect(() => validator('compact')).not.toThrow();
+            expect(() => validator('invalid')).toThrow('Invalid output format: invalid');
           }
           return program;
         }),
@@ -290,7 +313,52 @@ describe('CLI commands', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('No API key provided for anthropic')
       );
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      expect(processExitSpy).toHaveBeenCalledWith(1); // API key error code
+    });
+
+    it('should respect quiet mode to reduce output verbosity', async () => {
+      // Reset API key
+      process.env.ANTHROPIC_API_KEY = 'test-api-key';
+
+      // Extract the action handler
+      const program = {
+        command: vi.fn().mockReturnThis(),
+        description: vi.fn().mockReturnThis(),
+        option: vi.fn().mockReturnThis(),
+        action: vi.fn().mockImplementation((handler) => {
+          // Call the handler with quiet mode enabled
+          handler({
+            count: 5,
+            quiet: true,
+          });
+          return program;
+        }),
+      } as unknown as Command;
+
+      // Clear previous calls before testing quiet mode
+      consoleLogSpy.mockClear();
+
+      wordsCommand(program);
+
+      // Wait for async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // In quiet mode, certain messages should not be logged
+      const logs = consoleLogSpy.mock.calls.map(call => call[0]);
+
+      // These strings should not appear in quiet mode logs
+      const verboseMessages = [
+        'Starting word evaluation...',
+        'Evaluation completed in',
+      ];
+
+      // Check if any of the verbose messages appear in the logs
+      const foundVerboseMessages = verboseMessages.filter(message =>
+        logs.some(log => typeof log === 'string' && log.includes(message))
+      );
+
+      // There should be no verbose messages found
+      expect(foundVerboseMessages).toEqual([]);
     });
 
     afterEach(() => {
