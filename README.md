@@ -1,135 +1,51 @@
 # finlaysonstudio-model-evals
 
-A monorepo for evaluating LLM randomness and distributional behavior.
+A TypeScript monorepo for evaluating large language model randomness and distributional behavior through structured bias analysis.
 
-## Status
+## ✈️ Overview
 
-The project is in active development with a working framework for model evaluations.
+This project quantifies biases in large language models through comprehensive evaluations.
+The framework provides programmatic APIs and a command-line interface for analyzing model behaviors across multiple dimensions.
 
-## Purpose
+Primary evaluation targets include random word selection bias, position bias in choices, and statistical analysis of model response patterns.
 
-This project aims to quantify biases in large language models through structured evaluations, particularly focusing on:
+## 💿 Installation
 
-- Random word selection bias
-- Position bias in choices
-- Statistical analysis of model behaviors
+```bash
+# Clone the repository
+git clone https://github.com/finlaysonstudio/finlaysonstudio-model-evals.git
+cd finlaysonstudio-model-evals
 
-## Design
+# Install dependencies
+npm install
 
-TypeScript/Node.js monorepo using:
-- Vercel AI SDK for model interactions
-- MongoDB for persistence
-- Vitest for testing
-
-## Packages
-
-The project is organized as a monorepo with the following packages:
-
-### `@finlaysonstudio/eval-models`
-
-Model interfaces and data persistence for LLM evaluations.
-
-- Abstract model client interface with adapters for multiple LLM providers (OpenAI, Anthropic)
-- MongoDB integration for storing evaluation runs, model responses, and analysis results
-- Tracking service for logging model interactions
-- Implements model provider abstraction using Vercel AI SDK
-
-### `@finlaysonstudio/eval-random-words`
-
-Tests a model's ability to select random words, analyzing potential biases in selection.
-
-- Generates prompts asking models to select a random word from a list
-- Randomizes the order of word options to control for position bias
-- Collects and analyzes distribution of word selections
-- Implements position bias detection and statistical analysis
-- Provides comprehensive statistical tests (chi-square, entropy, runs test)
-
-### `@finlaysonstudio/eval-models-cli`
-
-Command-line interface for running model evaluations.
-
-- Simple CLI for executing evaluations without writing code
-- Supports random word selection evaluations via the `words` command
-- Configurable parameters for evaluation count, word list, and output format
-- Multiple output formats: table, JSON, CSV, and compact
-- Optional database integration for storing evaluation results
-
-## Tracking Results
-
-The project includes a comprehensive system for tracking and analyzing evaluation results:
-
-### Database Integration
-
-```typescript
-// Connect to MongoDB
-await connectToDatabase({
-  uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/model-evals',
-  options: {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-});
+# Build all packages
+npm run build
 ```
 
-### Enabling Tracking in Evaluations
+For CLI-only usage:
 
-Enable tracking by adding a `tracking` option to your evaluation:
-
-```typescript
-const evalOptions = {
-  options: ['clubs', 'diamonds', 'hearts', 'spades'],
-  numRuns: 100,
-  tracking: {
-    enabled: true,
-    name: 'Card Suit Random Selection Test',
-    description: 'Evaluating model\'s ability to select random card suits',
-    modelProvider: 'openai',
-    modelName: 'gpt-4-turbo'
-  }
-};
-
-// Run evaluation with tracking
-const result = await evaluateRandomWordSelection(model, evalOptions);
-// The results are automatically saved to MongoDB
+```bash
+npm install -g @finlaysonstudio/eval-models-cli
 ```
 
-### Retrieving and Analyzing Results
+## 📋 Usage
 
-The `EvaluationService` provides methods to retrieve and analyze tracked results:
+### Command Line Interface
 
-```typescript
-// Create an evaluation service
-const evaluationService = new EvaluationService();
+```bash
+# Run basic word randomness evaluation
+evals words
 
-// Get all evaluation runs (can filter by model, type, etc.)
-const runs = await evaluationService.getEvaluationRuns({
-  modelProvider: 'openai',
-  type: EvaluationRunType.RANDOM_WORD
-});
+# Customize evaluation parameters
+evals words --count 50 --words "apple,banana,cherry,durian"
 
-// Get a specific evaluation run
-const run = await evaluationService.getEvaluationRun(evaluationRunId);
+# Enable detailed output formatting
+evals words --count 100 --format json
 
-// Get model responses for a specific run
-const responses = await evaluationService.getModelResponses(evaluationRunId);
-
-// Get analysis results for a specific run
-const analysisResults = await evaluationService.getAnalysisResults(
-  evaluationRunId,
-  AnalysisResultType.FREQUENCY_DISTRIBUTION
-);
-
-// Save custom analysis results
-await evaluationService.saveAnalysisResult({
-  evaluationRunId,
-  type: AnalysisResultType.CUSTOM,
-  name: 'My Analysis',
-  description: 'Custom statistical analysis',
-  result: { /* your analysis data */ }
-});
+# Run with debug output
+evals words --debug
 ```
-
-## Example Usage
 
 ### Programmatic API
 
@@ -137,14 +53,12 @@ await evaluationService.saveAnalysisResult({
 import { createModelClient } from '@finlaysonstudio/eval-models';
 import { evaluateRandomWordSelection } from '@finlaysonstudio/eval-random-words';
 
-// Create a model client
 const model = createModelClient({
   provider: 'openai',
   apiKey: process.env.OPENAI_API_KEY,
   modelName: 'gpt-4-turbo'
 });
 
-// Run 100 evaluations to test randomness
 const results = await evaluateRandomWordSelection(model, {
   options: ['apple', 'banana', 'cherry', 'durian'],
   numRuns: 100,
@@ -160,37 +74,125 @@ console.log(`Word frequencies:`, results.selectedWords);
 console.log(`Position bias:`, results.positionBias);
 ```
 
-### Command Line Interface
+## 📖 Reference
 
-```bash
-# Install the CLI
-npm install -g @finlaysonstudio/eval-models-cli
+### Architecture
 
-# Run a basic evaluation
-evals words
+TypeScript/Node.js monorepo structure:
+- Vercel AI SDK for model interactions
+- MongoDB for persistence and analysis tracking
+- Vitest for comprehensive testing
+- Commander.js for CLI implementation
 
-# Run with custom parameters
-evals words --count 50 --words "apple,banana,cherry,durian" --format json
+### Packages
 
-# Run with tracking enabled
-evals words --tracking --model-provider openai --count 100
+#### `@finlaysonstudio/eval-models`
+
+Model interfaces and data persistence infrastructure.
+
+- Abstract model client interface with adapters for OpenAI and Anthropic
+- MongoDB integration for evaluation runs, responses, and analysis results
+- Response tracking service for comprehensive logging
+- Model provider abstraction via Vercel AI SDK
+
+#### `@finlaysonstudio/eval-random-words`
+
+Random word selection bias evaluation framework.
+
+- Prompt generation for random word selection tasks
+- Position bias control through option randomization
+- Distribution analysis with statistical significance testing
+- Comprehensive statistical tests including chi-square, entropy, and runs tests
+
+#### `@finlaysonstudio/eval-models-cli`
+
+Command-line interface for evaluation execution.
+
+- Simple CLI execution without programming requirements
+- `words` command for random word selection evaluations
+- Configurable parameters: count, word lists, output formats
+- Multiple output formats: table, JSON, CSV, compact
+- Optional database integration for result persistence
+
+### Database Integration and Tracking
+
+Enable comprehensive evaluation tracking with MongoDB integration:
+
+```typescript
+import { connectToDatabase } from '@finlaysonstudio/eval-models';
+
+await connectToDatabase({
+  uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/model-evals'
+});
+
+const evalOptions = {
+  options: ['clubs', 'diamonds', 'hearts', 'spades'],
+  numRuns: 100,
+  tracking: {
+    enabled: true,
+    name: 'Card Suit Random Selection Test',
+    description: 'Evaluating model\'s ability to select random card suits',
+    modelProvider: 'openai',
+    modelName: 'gpt-4-turbo'
+  }
+};
+
+const result = await evaluateRandomWordSelection(model, evalOptions);
 ```
 
-## Testing
+### Analysis and Retrieval
 
-This project follows a co-location testing approach where test files are located next to the files they test:
+```typescript
+import { EvaluationService } from '@finlaysonstudio/eval-models';
 
-- Tests are written using Vitest
-- Test files use the naming pattern: `*.test.ts`
-- Test files are placed in the same directory as the file they test
-- Run tests with `npm test`
+const evaluationService = new EvaluationService();
 
-## Getting Started
+// Retrieve evaluation runs with filtering
+const runs = await evaluationService.getEvaluationRuns({
+  modelProvider: 'openai',
+  type: EvaluationRunType.RANDOM_WORD
+});
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Build packages: `npm run build`
-4. Run tests: `npm test`
-5. For MongoDB integration, set the `MONGODB_URI` environment variable or use a local MongoDB instance
+// Access detailed results and analysis
+const responses = await evaluationService.getModelResponses(evaluationRunId);
+const analysisResults = await evaluationService.getAnalysisResults(
+  evaluationRunId,
+  AnalysisResultType.FREQUENCY_DISTRIBUTION
+);
+```
+
+## 💻 Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build all packages
+npm run build
+
+# Run tests
+npm test
+
+# Type checking
+npm run typecheck
+```
+
+### Testing Strategy
+
+Co-located testing approach with Vitest:
+- Test files use `*.test.ts` naming pattern
+- Tests located adjacent to source files
+- Comprehensive unit and integration test coverage
+
+### Environment Setup
+
+Set environment variables for database integration:
+```bash
+export MONGODB_URI="mongodb://localhost:27017/model-evals"
+export OPENAI_API_KEY="your-openai-key"
+export ANTHROPIC_API_KEY="your-anthropic-key"
+```
+
+## 📜 License
 
 Generated with 🩶 and the MIT license.
