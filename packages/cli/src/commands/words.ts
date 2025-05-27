@@ -10,7 +10,7 @@ import {
   evaluateRandomWordSelection,
   EvaluationOptions,
   PromptStyle
-} from '@finlaysonstudio/eval-random-word';
+} from '@finlaysonstudio/eval-random-words';
 import { formatOutput, OutputFormat } from '../utils/formatting.js';
 
 interface WordsOptions {
