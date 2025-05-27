@@ -22,7 +22,7 @@
   "author": "Finlayson Studio",
   "license": "MIT",
   "dependencies": {
-    "commander": "^13.0.0"
+    "commander": "^14.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.2",
