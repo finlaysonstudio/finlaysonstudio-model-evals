@@ -22,6 +22,8 @@
   "author": "Finlayson Studio",
   "license": "MIT",
   "dependencies": {
+    "@finlaysonstudio/eval-models": "^0.0.1",
+    "@finlaysonstudio/eval-random-words": "^0.0.1",
     "commander": "^14.0.0"
   },
   "devDependencies": {
